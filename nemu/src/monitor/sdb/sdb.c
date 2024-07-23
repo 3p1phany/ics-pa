@@ -53,6 +53,44 @@ static int cmd_q(char *args) {
   return -1;
 }
 
+static int cmd_info(char *args) {
+  if(args == NULL){
+    Log("info needs arg!");
+    return 0;
+  }
+  char opt;
+  sscanf(args,"%c",&opt);
+  if(opt=='r'){
+    isa_reg_display();
+  }
+  return 0;
+}
+
+static int cmd_x(char *args) {
+  if(args == NULL){
+    Log("x needs arg!");
+    return 0;
+  }
+  int nr_inst;
+  word_t addr;
+  sscanf(args,"%d %i",&nr_inst,&addr);
+  for(int i=0;i<nr_inst;i++){
+    printf("0x%x\t0x%x\n",addr+i*4,paddr_read(addr+i*4,4));
+  }
+  return 0;
+}
+
+static int cmd_si(char *args) {
+  if(args == NULL){
+    cpu_exec(1);
+    return 0;
+  }
+  int n;
+  sscanf(args,"%d",&n);
+  cpu_exec(n);
+  return 0;
+}
+
 static int cmd_help(char *args);
 
 static struct {
@@ -63,9 +101,9 @@ static struct {
   { "help", "Display information about all supported commands", cmd_help },
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
-
-  /* TODO: Add more commands */
-
+  { "si", "Execute several instructions", cmd_si },
+  { "info", "Tell value of regs or watchpoint", cmd_info },
+  { "x", "Tell value of memory", cmd_x },
 };
 
 #define NR_CMD ARRLEN(cmd_table)
